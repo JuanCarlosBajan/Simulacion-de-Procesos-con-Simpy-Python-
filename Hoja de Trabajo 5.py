@@ -19,3 +19,11 @@ def Process(env,name, Ram,cpu, memoria, instrucciones, redIns, tiempoEspera, Tie
             with cpu.request() as req:
                 yield req
                 tiempoInterno = tiempoInterno + env.now-pivoteTiempo +1
+                yield env.timeout(1)
+                instrucciones = instrucciones- redIns
+
+                des = random.randint(1,2)
+
+                if(des == 1):
+                    print('Enviando proceso %s a cola de espera por %s segundos. Tiempo Actual: %s ( Ocupando %s megas de memoria)' % (name, tiempoEspera, env.now, memoria))
+                    
