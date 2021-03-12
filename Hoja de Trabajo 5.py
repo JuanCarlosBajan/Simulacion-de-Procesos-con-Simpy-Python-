@@ -26,4 +26,31 @@ def Process(env,name, Ram,cpu, memoria, instrucciones, redIns, tiempoEspera, Tie
 
                 if(des == 1):
                     print('Enviando proceso %s a cola de espera por %s segundos. Tiempo Actual: %s ( Ocupando %s megas de memoria)' % (name, tiempoEspera, env.now, memoria))
-                    
+                    yield env.timeout(3)
+                    tiempoInterno = tiempoInterno + 1
+                else:
+                    c = 0
+                    print('Proceso %s, enviando a procesar %s instrucciones mas. Tiempo acatual: %s ( Ocupando %s megas de memoria)' % (name, redIns, env.now, memoria))
+        print('Proceso %s exitoso, finalizando en tiempo: %s' % (name, env.now))
+        Ram.put(memoria)
+        run = False
+    print("Le tomo %s segundos a %s terminar el proceso." %(tiempoInterno,name))
+    TiempoTotal.put(tiempoInterno)
+            
+
+
+
+env = simpy.Environment()
+Ram = simpy.Container(env, init=100,capacity=100)
+TiempoTotal = simpy.Container(env,capacity=1000000000000000000)
+cpu = simpy.Resource(env, capacity= 2)
+
+procesos = 200
+
+
+
+for i in range(procesos):
+    env.process(Process(env, i+1,Ram,cpu,random.randint(1,10),random.randint(1,10),3, round(random.expovariate(1/10) + 1), TiempoTotal))
+
+env.run()
+print(TiempoTotal.level/procesos)
